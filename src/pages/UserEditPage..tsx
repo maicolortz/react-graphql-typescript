@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import UserForm from '../components/UserForm';
 import { getUser, updateUser } from '../utils/api';
+
 interface User {
     name: string;
     email: string;
@@ -9,49 +9,80 @@ interface User {
     status: string;
 }
 
-const UserEditPage: React.FC<{ id2: number }> = ({ id2 }) => {
-    const { id } = useParams<{ id: string }>();
-    const [user, setUser] = useState<User>();
+const UserEditPage: React.FC = () => {
+    const [id, setId] = useState<number | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const user = await getUser(id2);
-                setUser(user);
-                console.log(user)
-            } catch (error) {
-                console.log(error);
-                // Mostrar mensaje o alerta de error
+
+    const fetchUser = async () => {
+        try {
+            setLoading(true);
+            const userData = await getUser(id!);
+            if (userData) {
+                setUser(userData);
+                setError('');
+            } else {
+                fetchUser();
+                setError('No existe ese Usuario con ese id ');
+
             }
-        };
-
-        fetchUser();
-    }, [id2]);
+        } catch (error) {
+            console.log(error);
+            setId(null);
+            setUser(null);
+            setLoading(false);
+            setError('No existe el Usuario con ese id ');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmit = async (user: User) => {
         try {
-            const userdata = await updateUser(id2, user);
-            console.log(userdata)
-            alert("actualizado con exito")
-            // Mostrar mensaje o alerta de éxito
+            await updateUser(id!, user);
+            // Vuelve a obtener el usuario actualizado
+            setId(null);
+            setUser(null);
+            setLoading(false);
+            setError('');
+            fetchUser();
         } catch (error) {
             console.log(error);
-            // Mostrar mensaje o alerta de error
+            setError('Ocurrio un problema al actualizar ');
+
         }
     };
 
     return (
-        <div>
-            <h1>Editar Usuario</h1>
+        <div className="bg-slate-300 p-8 rounded shadow mx-auto h-full my-auto items-center flex flex-col">
 
-            {user ? (
+            <h1 className="text-2xl font-bold mb-4">Editar Usuario</h1>
+            <label className="font-bold">Consulta de Usuario</label>
+            <input
+                type="number"
+                placeholder="ID de usuario"
+                value={id !== null ? id : ''}
+                onChange={(e) => setId(e.target.value !== '' ? parseInt(e.target.value) : null)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        fetchUser();
+                    }
+                }}
+                className="border border-gray-300 rounded py-2 px-4 mb-4"
+            />
+            {loading ? (
+                <p >Cargando usuario...</p>
+            ) : user ? (
                 <UserForm onSubmit={handleSubmit} initialUser={user} />
             ) : (
-                <p>Cargando usuario...</p>
+                <p className="bg-red-200 text-red-800 p-4 rounded">{error}</p>
             )}
         </div>
     );
+
 };
 
 export default UserEditPage;

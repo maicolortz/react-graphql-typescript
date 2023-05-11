@@ -108,12 +108,12 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
-                <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded" type="submit">
+                <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold w-full py-2 px-4 rounded" type="submit">
                     {initialUser ? 'Actualizar' : 'Crear'}
                 </button>
             </form>
-            {errorMessage && <p>{errorMessage}</p>}
-            {successMessage && <p>{successMessage}</p>}
+            {errorMessage && <p className="bg-red-200 text-red-800 p-4 rounded">{errorMessage}</p>}
+            {successMessage && <p className="bg-green-200 text-green-800 p-4 rounded">{successMessage}</p>}
         </div>
     );
 

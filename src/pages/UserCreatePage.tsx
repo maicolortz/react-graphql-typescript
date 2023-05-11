@@ -12,9 +12,6 @@ interface User {
 const UserCreatePage: React.FC = () => {
     const handleSubmit = async (user: User) => {
         try {
-            const data = await createUser(user);
-            console.log(data);
-            alert("creado con exito")
             // Mostrar mensaje o alerta de éxito
         } catch (error) {
             console.log(error);
@@ -23,8 +20,9 @@ const UserCreatePage: React.FC = () => {
     };
 
     return (
-        <div>
-            <h1>Crear Usuario</h1>
+        <div className="bg-slate-300 p-8 rounded shadow mx-auto my-auto items-center flex flex-col">
+
+            <h1 className="text-2xl font-bold mb-4">Registrar Usuario</h1>
             <UserForm onSubmit={handleSubmit} />
         </div>
     );

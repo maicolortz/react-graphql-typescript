@@ -15,7 +15,7 @@ const client = new ApolloClient({
   },
 });
 
-export const getLastFiveteenUsers = (): Promise<User[]> => {
+export const getLastFiveteenUsers = async (): Promise<User[]> => {
   return client
     .query({
       query: gql`
@@ -42,7 +42,7 @@ export const getLastFiveteenUsers = (): Promise<User[]> => {
     });
 };
 
-export const getUser = (id: number): Promise<User> => {
+export const getUser = async (id: number): Promise<User> => {
   return client
     .query({
       query: gql`
@@ -63,7 +63,7 @@ export const getUser = (id: number): Promise<User> => {
     .then((response) => response.data.user);
 };
 
-export const createUser = (user: User): Promise<User> => {
+export const createUser = async (user: User): Promise<User> => {
   const { name, gender, email, status } = user;
 
   return client
@@ -103,7 +103,7 @@ export const createUser = (user: User): Promise<User> => {
     .then((response) => response.data.createUser);
 };
 
-export const updateUser = (id: number, user: User): Promise<User> => {
+export const updateUser = async (id: number, user: User): Promise<User> => {
   const { name, gender, email, status } = user;
 
   return client
@@ -131,25 +131,34 @@ export const updateUser = (id: number, user: User): Promise<User> => {
     .then((response) => response.data.updateUser);
 };
 
-export const deleteUser = (id: number): Promise<void> => {
-  return client
-    .mutate({
-      mutation: gql`
-        mutation DeleteUser($id: Int!) {
-          deleteUser(input: { id: $id }) {
-            user {
-              id
-              name
-              email
-              gender
-              status
-            }
+export const deleteUser = async (id: number): Promise<User> => {
+  const response = await client.mutate({
+    mutation: gql`
+      mutation DeleteUser($id: Int!) {
+        deleteUser(input: { id: $id }) {
+          user {
+            id
+            name
+            email
+            gender
+            status
           }
         }
-      `,
-      variables: {
-        id: id,
-      },
-    })
-    .then((response) => response.data);
+      }
+    `,
+    variables: {
+      id: id,
+    },
+    update: (cache) => {
+      cache.modify({
+        fields: {
+          user(existingUser, { DELETE }) {
+            return DELETE;
+          },
+        },
+      });
+    },
+  });
+
+  return response.data.deleteUser.user;
 };
