@@ -1,7 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 interface User {
-  id: number;
   name: string;
   email: string;
   gender: string;
@@ -47,8 +46,8 @@ export const getUser = (id: number): Promise<User> => {
   return client
     .query({
       query: gql`
-        query {
-          user(id: 925) {
+        query GetUser($id: ID!) {
+          user(id: $id) {
             id
             name
             email
@@ -58,8 +57,99 @@ export const getUser = (id: number): Promise<User> => {
         }
       `,
       variables: {
-        id: id,
+        id: String(id),
       },
     })
     .then((response) => response.data.user);
+};
+
+export const createUser = (user: User): Promise<User> => {
+  const { name, gender, email, status } = user;
+
+  return client
+    .mutate({
+      mutation: gql`
+        mutation (
+          $name: String!
+          $gender: String!
+          $email: String!
+          $status: String!
+        ) {
+          createUser(
+            input: {
+              name: $name
+              gender: $gender
+              email: $email
+              status: $status
+            }
+          ) {
+            user {
+              id
+              name
+              gender
+              email
+              status
+            }
+          }
+        }
+      `,
+      variables: {
+        name,
+        gender,
+        email,
+        status,
+      },
+    })
+    .then((response) => response.data.createUser);
+};
+
+export const updateUser = (id: number, user: User): Promise<User> => {
+  const { name, gender, email, status } = user;
+
+  return client
+    .mutate({
+      mutation: gql`
+          mutation {
+            updateUser(input: {
+              id: ${id}
+              name: "${name}"
+              gender: "${gender}"
+              email: "${email}"
+              status: "${status}"
+            }) {
+              user {
+                id
+                name
+                gender
+                email
+                status
+              }
+            }
+          }
+        `,
+    })
+    .then((response) => response.data.updateUser);
+};
+
+export const deleteUser = (id: number): Promise<void> => {
+  return client
+    .mutate({
+      mutation: gql`
+        mutation DeleteUser($id: Int!) {
+          deleteUser(input: { id: $id }) {
+            user {
+              id
+              name
+              email
+              gender
+              status
+            }
+          }
+        }
+      `,
+      variables: {
+        id: id,
+      },
+    })
+    .then((response) => response.data);
 };

@@ -1,7 +1,6 @@
 import React from 'react';
 
 interface User {
-    id: number;
     name: string;
     email: string;
     gender: string;
@@ -18,7 +17,7 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
             <h2>Lista de Usuarios</h2>
 
             {users.map((user) => (
-                <ul key={user.id}>
+                <ul key={user.email}>
                     <li >{user.name}</li>
                     <li>{user.email}</li>
                     <li >{user.gender}</li>

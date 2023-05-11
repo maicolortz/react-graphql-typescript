@@ -2,16 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import UserForm from '../components/UserForm';
 import { getUser, updateUser } from '../utils/api';
+interface User {
+    name: string;
+    email: string;
+    gender: string;
+    status: string;
+}
 
-const UserEditPage: React.FC = () => {
+const UserEditPage: React.FC<{ id2: number }> = ({ id2 }) => {
     const { id } = useParams<{ id: string }>();
-    const [name, setName] = useState('');
+    const [user, setUser] = useState<User>();
+
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const user = await getUser(parseInt(id || "0"));
-                setName(user.name);
+                const user = await getUser(id2);
+                setUser(user);
+                console.log(user)
             } catch (error) {
                 console.log(error);
                 // Mostrar mensaje o alerta de error
@@ -19,11 +27,13 @@ const UserEditPage: React.FC = () => {
         };
 
         fetchUser();
-    }, [id]);
+    }, [id2]);
 
-    const handleSubmit = async (name: string | undefined) => {
+    const handleSubmit = async (user: User) => {
         try {
-            await updateUser(parseInt(id || "0"), name ?? "");
+            const userdata = await updateUser(id2, user);
+            console.log(userdata)
+            alert("actualizado con exito")
             // Mostrar mensaje o alerta de éxito
         } catch (error) {
             console.log(error);
@@ -34,8 +44,9 @@ const UserEditPage: React.FC = () => {
     return (
         <div>
             <h1>Editar Usuario</h1>
-            {name ? (
-                <UserForm onSubmit={handleSubmit} initialName={name} />
+
+            {user ? (
+                <UserForm onSubmit={handleSubmit} initialUser={user} />
             ) : (
                 <p>Cargando usuario...</p>
             )}

@@ -3,7 +3,6 @@ import UserList from '../components/UserList';
 import { getLastFiveteenUsers, getUser } from '../utils/api';
 
 interface User {
-    id: number;
     name: string;
     email: string;
     gender: string;
@@ -20,8 +19,8 @@ const HomePage: React.FC = () => {
                 setUsers(response);
                 console.log(response);
 
-                const data = await getUser(925)
-                console.log(data)
+                /*   const data = await getUser(925)
+                  console.log(data) */
             } catch (error) {
                 console.log(error);
             }
