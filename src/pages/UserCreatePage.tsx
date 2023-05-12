@@ -18,7 +18,7 @@ const UserCreatePage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState('');
     const handleSubmit = async (user: User) => {
         try {
-            createUser(user, setMutationAction)
+            await createUser(user, setMutationAction)
             toast.success("'Usuario creado exitosamente'")
             setErrorMessage("")
             // Mostrar mensaje o alerta de éxito
