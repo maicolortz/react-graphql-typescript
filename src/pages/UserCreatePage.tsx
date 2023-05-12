@@ -24,7 +24,7 @@ const UserCreatePage: React.FC = () => {
             // Mostrar mensaje o alerta de éxito
         } catch (error) {
             console.log(error)
-            setErrorMessage("Problema de validacion")
+            setErrorMessage("Problema de validacion con el email")
             // Mostrar mensaje o alerta de error
         }
     };

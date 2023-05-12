@@ -49,8 +49,9 @@ const UserEditPage: React.FC = () => {
 
     const handleSubmit = async (user: User) => {
         try {
-            await updateUser(id!, user, setMutationAction);
+            const data = await updateUser(id!, user, setMutationAction);
             // Vuelve a obtener el usuario actualizado
+            console.log(data)
             setId(null);
             setUser(null);
             setLoading(false);
@@ -88,6 +89,7 @@ const UserEditPage: React.FC = () => {
             ) : (
                 <p className="bg-red-200 text-red-800 p-4 rounded">{error}</p>
             )}
+            <p className=" text-red-800 p-4 rounded">{error}</p>
             <ToastContainer />
         </div>
     );
