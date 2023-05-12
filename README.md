@@ -20,7 +20,7 @@ Este es un proyecto de ejemplo que implementa un sistema de gestión de usuarios
 - Tailwind CSS: Framework CSS utilizado para estilizar la interfaz de usuario.
 - React Toastify: Biblioteca para mostrar notificaciones de estilo toast en React.
 - TypeScript: Lenguaje de programación tipado utilizado para el desarrollo del proyecto.
-
+- Zustand : Gestor de estado sencillo para controlar y actualizar los 15 usuarios cada vez que huviera una eliminacion o actualizacion de un usuario.
 ## Configuración
 
 1. Clona el repositorio en tu máquina local:
