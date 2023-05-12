@@ -1,7 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 interface User {
+    id?: number;
     name: string;
     email: string;
     gender: string;
@@ -20,14 +20,18 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 
                 {users.map((user) => (
-                    <div key={user.email} className="bg-white p-4 rounded shadow">
+                    <div key={user.email} className="bg-gradient-to-r from-blue-200 to to-blue-300  p-4 rounded shadow">
+                        <div className="mb-2">
+                            <label className="font-bold">Id:</label>
+                            <p>{user.id}</p>
+                        </div>
                         <div className="mb-2">
                             <label className="font-bold">Nombre:</label>
                             <p>{user.name}</p>
                         </div>
-                        <div className="mb-2">
+                        <div className="mb-2 flex flex-col">
                             <label className="font-bold">Email:</label>
-                            <p>{user.email}</p>
+                            <p className='overflow-hidden overflow-ellipsis break-words'>{user.email}</p>
                         </div>
                         <div className="mb-2">
                             <label className="font-bold">Género:</label>

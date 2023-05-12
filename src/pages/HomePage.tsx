@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import UserList from '../components/UserList';
-import { getLastFiveteenUsers, getUser } from '../utils/api';
-import { Link } from 'react-router-dom';
+import { getLastFifteenUsers } from '../utils/api';
+
+import { useMutationStore } from "../Context/mutactionStore";
 
 interface User {
+    id?: number;
     name: string;
     email: string;
     gender: string;
@@ -11,74 +13,34 @@ interface User {
 }
 
 const HomePage: React.FC = () => {
+
+    const mutationStore = useMutationStore();
+    const { mutationAction, setMutationAction } = mutationStore;
     const [users, setUsers] = useState<User[]>([]);
 
+    const fetchUsers = async () => {
+        try {
+            const response = await getLastFifteenUsers();
+            setUsers(response);
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await getLastFiveteenUsers();
-                setUsers(response);
-                console.log(response);
+        fetchUsers()
+    }, [])
 
-                /*   const data = await getUser(925)
-                  console.log(data) */
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchUsers();
-    }, []);
+    useEffect(() => {
+        // corre fetch cuando hay una mutacion y asi mantiene actualizado en tiempo real la lista de usuarios
+        if (mutationAction) {
+            fetchUsers();
+        }
+    }, [mutationAction, setMutationAction]);
 
     return (
-        <div>
-            <div id='secciones'>
-                <nav className="flex justify-between bg-slate-300 py-4 px-8">
-                    <ul className="flex space-x-4">
-                        <li>
-                            <Link
-                                to="/"
-                                className="hover:text-blue-500 hover:shadow"
-                            >
-                                Inicio
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/users"
-                                className="hover:text-blue-500 hover:shadow"
-                            >
-                                Consultar Usuario por ID
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/users/new"
-                                className="hover:text-blue-500 hover:shadow"
-                            >
-                                Crear Usuario
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/users/edit"
-                                className="hover:text-blue-500 hover:shadow"
-                            >
-                                Editar Usuario
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/users/delete"
-                                className="hover:text-blue-500 hover:shadow"
-                            >
-                                Eliminar Usuario
-                            </Link>
-                        </li>
-                    </ul>
-                </nav>
-
-            </div>
+        <div >
             <UserList users={users} />
         </div>
     );

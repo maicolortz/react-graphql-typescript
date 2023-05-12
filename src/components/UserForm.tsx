@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useMutationStore } from '../Context/mutactionStore';
 
 interface User {
+    id?: number;
     name: string;
     email: string;
     gender: string;
@@ -10,9 +12,11 @@ interface User {
 interface UserFormProps {
     onSubmit: (user: User) => Promise<void>;
     initialUser?: User;
+
 }
 
 const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
+
     const [name, setName] = useState("");
     const [gender, setGender] = useState('');
     const [email, setEmail] = useState('');
@@ -20,21 +24,29 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
+    //Estado global
+    const mutationStore = useMutationStore();
+    const { setMutationAction } = mutationStore;
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name || !gender || !email || !status) {
             setErrorMessage('Todos los campos son requeridos');
+
             return;
         }
+
         setErrorMessage('');
         const user: User = { name, gender, email, status };
         try {
             await onSubmit(user);
-            setSuccessMessage(initialUser ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente');
+            setMutationAction("mutacion")
             setName('');
             setGender('');
             setEmail('');
             setStatus('');
+
         } catch (error) {
             setErrorMessage('Error al ' + (initialUser ? 'actualizar' : 'crear') + ' el usuario');
         }
@@ -46,6 +58,8 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
             setGender(initialUser.gender);
             setEmail(initialUser.email);
             setStatus(initialUser.status);
+            setSuccessMessage("")
+            setErrorMessage("")
         }
     }, [initialUser])
 
@@ -65,6 +79,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
                         onChange={(e) => setName(e.target.value)}
                     />
                 </div>
+
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">
                         Género
@@ -80,6 +95,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
                         <option value="female">Female</option>
                     </select>
                 </div>
+
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                         Email
@@ -93,6 +109,7 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
                         onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
+
                 <div className="mb-4">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="status">
                         Estado
@@ -108,12 +125,14 @@ const UserForm: React.FC<UserFormProps> = ({ onSubmit, initialUser }) => {
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
+
                 <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold w-full py-2 px-4 rounded" type="submit">
                     {initialUser ? 'Actualizar' : 'Crear'}
                 </button>
+
             </form>
             {errorMessage && <p className="bg-red-200 text-red-800 p-4 rounded">{errorMessage}</p>}
-            {successMessage && <p className="bg-green-200 text-green-800 p-4 rounded">{successMessage}</p>}
+
         </div>
     );
 

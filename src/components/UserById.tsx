@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUser, deleteUser } from '../utils/api';
+import { useMutationStore } from '../Context/mutactionStore';
 
 interface User {
     name: string;
@@ -13,17 +14,17 @@ interface UserPageProps {
 }
 
 const UserById: React.FC<UserPageProps> = ({ type }) => {
+    const mutationStore = useMutationStore();
+    const { setMutationAction } = mutationStore;
+
     const [id, setId] = useState<number | undefined>();
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState<string | null>(null);
+
     const [successMessage, setSuccessMessage] = useState('');
 
-    useEffect(() => {
-        if (id) {
-            fetchUser();
-        }
-    }, [id]);
+
 
     useEffect(() => {
         if (successMessage) {
@@ -34,13 +35,10 @@ const UserById: React.FC<UserPageProps> = ({ type }) => {
     const fetchUser = async () => {
         try {
             setLoading(true);
-            setError('');
+            setUser(null)
             const response = await getUser(id!);
-            console.log("----------------");
-            console.log(response);
             setUser(response);
         } catch (error) {
-            setUser(null);
             setError('No existe ese Usuario con ese id en la base de datos');
         } finally {
             setLoading(false);
@@ -65,18 +63,22 @@ const UserById: React.FC<UserPageProps> = ({ type }) => {
             setError('Por favor, ingrese un ID válido');
             return;
         }
-        setError('');
 
         try {
-            await deleteUser(id);
+            const data = await deleteUser(id, setMutationAction);
+            setError(null)
+            setUser(null)
             setSuccessMessage('Usuario eliminado exitosamente');
+            setId(undefined)
+            setMutationAction("deletetodo")
         } catch (error) {
             setError('El usuario no se encuentra en la Base de datos');
         }
     };
 
+
     return (
-        <div className="bg-slate-300  p-8 rounded shadow mx-auto h-screen my-auto items-center flex flex-col">
+        <div className="bg-slate-300  p-8 rounded shadow mx-auto  my-auto items-center flex flex-col">
 
             <h1 className="text-2xl font-bold mb-4">
                 {type === 'delete' ? 'Eliminar Usuario' : 'Consultar Usuario por ID'}
@@ -115,20 +117,25 @@ const UserById: React.FC<UserPageProps> = ({ type }) => {
                             {type === 'delete' && (
                                 <button
                                     className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
-                                    onClick={handleDeleteUser}
+                                    onClick={() => handleDeleteUser()}
                                 >
                                     Eliminar
                                 </button>
                             )}
                         </div>
                     ) : (
-                        <p className="bg-red-200 text-red-800 p-4 rounded">{error || 'Ingrese un ID de usuario válido y presione Enter'}</p>
+
+                        <p className=" text-red-800 p-4 rounded">
+                            {error}
+                        </p>
+
 
                     )}
                 </div>
             )}
-            {successMessage && <p className="bg-green-200 text-green-800 p-4 rounded">{successMessage}</p>
-            }
+            {successMessage && !user && (
+                <p className="bg-green-200 text-green-800 p-4 rounded">{successMessage}</p>
+            )}
         </div>
     );
 
